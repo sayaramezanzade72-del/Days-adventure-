@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Days of the Week Adventure</title>
+
+<style>
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+body{
+font-family:Arial,sans-serif;
+min-height:100vh;
+background:linear-gradient(135deg,#74ebd5,#ACB6E5);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.game{
+width:95%;
+max-width:850px;
+min-height:650px;
+background:white;
+border-radius:30px;
+padding:25px;
+box-shadow:0 15px 40px rgba(0,0,0,.2);
+overflow:hidden;
+}
+
+.hidden{
+display:none!important;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.title{
+font-size:clamp(25px,5vw,40px);
+font-weight:bold;
+color:#5b4bdb;
+text-align:center;
+}
+
+.info{
+background:#fff3cd;
+border-radius:15px;
+padding:10px 15px;
+font-weight:bold;
+}
+
+.screen{
+text-align:center;
+}
+
+h2{
+color:#ff6b6b;
+font-size:32px;
+margin:20px 0;
+}
+
+input{
+width:80%;
+max-width:400px;
+padding:16px;
+border:3px solid #74b9ff;
+border-radius:18px;
+font-size:20px;
+text-align:center;
+outline:none;
+}
+
+.start-btn{
+margin-top:25px;
+padding:16px 35px;
+background:#6c5ce7;
+color:white;
+border-radius:20px;
+font-size:22px;
+font-weight:bold;
+box-shadow:0 6px 0 #4834d4;
+}
+
+.start-btn:active{
+transform:translateY(5px);
+box-shadow:0 1px 0 #4834d4;
+}
+
+.stage{
+display:inline-block;
+background:#00b894;
+color:white;
+padding:8px 18px;
+border-radius:20px;
+font-weight:bold;
+}
+
+.lives{
+font-size:25px;
+margin:10px;
+}
+
+.timer{
+width:100%;
+max-width:500px;
+margin:15px auto;
+}
+
+.timer-bar{
+height:18px;
+background:#eee;
+border-radius:20px;
+overflow:hidden;
+}
+
+.timer-fill{
+height:100%;
+width:100%;
+background:#00b894;
+transition:width 1s linear;
+}
+
+.timer-text{
+margin-top:6px;
+font-size:20px;
+font-weight:bold;
+}
+
+.question{
+font-size:28px;
+font-weight:bold;
+color:#444;
+margin:20px 0;
+}
+
+.options{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+max-width:650px;
+margin:20px auto;
+}
+
+.option{
+padding:20px 10px;
+background:#81ecec;
+border-radius:20px;
+font-size:24px;
+font-weight:bold;
+color:#2d3436;
+box-shadow:0 5px 0 #00cec9;
+}
+
+.option.correct{
+background:#55efc4;
+}
+
+.option.wrong{
+background:#ff7675;
+}
+
+.listen-btn,
+.mic-btn{
+padding:18px 25px;
+border-radius:20px;
+font-size:22px;
+font-weight:bold;
+background:#fdcb6e;
+color:#2d3436;
+box-shadow:0 5px 0 #e17055;
+margin:10px;
+}
+
+.mic-btn{
+background:#a29bfe;
+color:white;
+box-shadow:0 5px 0 #6c5ce7;
+}
+
+.big-word{
+font-size:48px;
+font-weight:bold;
+color:#6c5ce7;
+margin:30px 0;
+}
+
+.speaking-status{
+min-height:35px;
+margin:15px;
+font-size:20px;
+font-weight:bold;
+}
+
+.letters{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+max-width:700px;
+margin:20px auto;
+}
+
+.letter{
+width:55px;
+height:55px;
+background:#ffeaa7;
+border-radius:15px;
+font-size:25px;
+font-weight:bold;
+box-shadow:0 5px 0 #fdcb6e;
+}
+
+.letter.used{
+opacity:.25;
+pointer-events:none;
+}
+
+.spell-box{
+min-height:65px;
+border:3px dashed #74b9ff;
+border-radius:20px;
+max-width:600px;
+margin:15px auto;
+padding:10px;
+font-size:35px;
+font-weight:bold;
+color:#6c5ce7;
+letter-spacing:4px;
+}
+
+.days-order{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+max-width:700px;
+margin:25px auto;
+}
+
+.day-btn{
+padding:15px 20px;
+background:#fab1a0;
+border-radius:18px;
+font-size:20px;
+font-weight:bold;
+box-shadow:0 5px 0 #e17055;
+}
+
+.day-btn.selected{
+opacity:.3;
+pointer-events:none;
+}
+
+.order-result{
+font-size:20px;
+font-weight:bold;
+min-height:35px;
+}
+
+.feedback{
+min-height:40px;
+font-size:24px;
+font-weight:bold;
+margin:15px;
+}
+
+.final-score{
+font-size:30px;
+color:#6c5ce7;
+font-weight:bold;
+margin:25px;
+}
+
+@media(max-width:600px){
+
+.game{
+padding:15px;
+}
+
+.header{
+flex-direction:column;
+gap:10px;
+}
+
+.options{
+grid-template-columns:1fr;
+}
+
+.option{
+font-size:20px;
+padding:16px;
+}
+
+.big-word{
+font-size:38px;
+}
+
+.letter{
+width:48px;
+height:48px;
+}
+
+.day-btn{
+font-size:17px;
+padding:12px 14px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<!-- START -->
+
+<div id="startScreen" class="screen">
+
+<div style="font-size:70px;">
+🌈📚🎈
+</div>
+
+<h1 class="title">
+Days of the Week Adventure
+</h1>
+
+<h2>
+Let's Learn the Days!
+</h2>
+
+<p style="font-size:20px;margin:20px;">
+Listen, read, speak, spell and order the days of the week!
+</p>
+
+<input
+id="playerName"
+type="text"
+placeholder="Enter Your Name"
+maxlength="20"
+>
+
+<br>
+
+<button class="start-btn" onclick="startGame()">
+🚀 Start Game
+</button>
+
+<p style="margin-top:30px;font-weight:bold;color:#777;">
+Teacher: Ms. Ramezanzadeh
+</p>
+
+</div>
+
+
+<!-- GAME -->
+
+<div id="gameScreen" class="hidden">
+
+<div class="header">
+
+<div class="title">
+🌈 Days Adventure
+</div>
+
+<div class="info">
+⭐ <span id="score">0</span>
+</div>
+
+</div>
+
+<div style="text-align:center;">
+
+<div id="stageTitle" class="stage">
+Stage 1
+</div>
+
+<div id="lives" class="lives">
+❤️❤️❤️❤️❤️
+</div>
+
+</div>
+
+<div class="timer">
+
+<div class="timer-bar">
+<div id="timerFill" class="timer-fill"></div>
+</div>
+
+<div class="timer-text">
+⏰ <span id="timerText">30</span>s
+</div>
+
+</div>
+
+<div id="questionArea"></div>
+
+<div id="feedback" class="feedback"></div>
+
+</div>
+
+
+<!-- END -->
+
+<div id="endScreen" class="screen hidden">
+
+<div id="endEmoji" style="font-size:90px;">
+🏆
+</div>
+
+<h1 id="endTitle" class="title">
+Amazing!
+</h1>
+
+<div id="endMessage"
+style="font-size:22px;margin:20px;">
+</div>
+
+<div class="final-score">
+⭐ Score: <span id="finalScore">0</span>
+</div>
+
+<button class="start-btn" onclick="location.reload()">
+🔄 Play Again
+</button>
+
+<p style="margin-top:30px;font-weight:bold;color:#777;">
+Teacher: Ms. Ramezanzadeh
+</p>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+DAYS
+========================= */
+
+const days=[
+"Monday",
+"Tuesday",
+"Wednesday",
+"Thursday",
+"Friday",
+"Saturday",
+"Sunday"
+];
+
+
+/* =========================
+GAME VARIABLES
+========================= */
+
+let playerName="";
+let stage=1;
+let questionIndex=0;
+
+let lives=5;
+let score=0;
+
+let timeLeft=30;
+let timerInterval=null;
+
+let currentDay="";
+
+let selectedLetters="";
+let selectedOrder=[];
+
+let questionLocked=false;
+
+let recognition=null;
+
+
+/* =========================
+START
+========================= */
+
+function startGame(){
+
+playerName=
+document.getElementById("playerName")
+.value.trim();
+
+if(!playerName){
+
+document.getElementById("playerName")
+.focus();
+
+return;
+}
+
+document
+.getElementById("startScreen")
+.classList.add("hidden");
+
+document
+.getElementById("gameScreen")
+.classList.remove("hidden");
+
+updateLives();
+
+showQuestion();
+
+}
+
+
+/* =========================
+TIMER
+========================= */
+
+function startTimer(){
+
+clearInterval(timerInterval);
+
+timeLeft=30;
+
+updateTimer();
+
+timerInterval=setInterval(function(){
+
+timeLeft--;
+
+updateTimer();
+
+if(timeLeft<=0){
+
+clearInterval(timerInterval);
+
+if(!questionLocked){
+
+questionLocked=true;
+
+loseLife("Time's up! ⏰");
+
+}
+
+}
+
+},1000);
+
+}
+
+
+function updateTimer(){
+
+document.getElementById("timerText")
+.textContent=timeLeft;
+
+document.getElementById("timerFill")
+.style.width=(timeLeft/30*100)+"%";
+
+}
+
+
+/* =========================
+LIVES
+========================= */
+
+function updateLives(){
+
+let hearts="";
+
+for(let i=0;i<5;i++){
+
+hearts+=
+i<lives ? "❤️" : "🖤";
+
+}
+
+document.getElementById("lives")
+.textContent=hearts;
+
+}
+
+
+/* =========================
+QUESTION CONTROL
+========================= */
+
+function showQuestion(){
+
+questionLocked=false;
+
+stopRecognition();
+
+document.getElementById("feedback")
+.textContent="";
+
+document.getElementById("stageTitle")
+.textContent=getStageTitle();
+
+
+if(stage===1){
+
+stage1();
+
+}
+
+else if(stage===2){
+
+stage2();
+
+}
+
+else if(stage===3){
+
+stage3();
+
+}
+
+else if(stage===4){
+
+stage4();
+
+}
+
+else if(stage===5){
+
+stage5();
+
+}
+
+startTimer();
+
+}
+
+
+function getStageTitle(){
+
+if(stage===1)
+return "Stage 1 🎧 Listen & Choose";
+
+if(stage===2)
+return "Stage 2 🎤 Read & Say";
+
+if(stage===3)
+return "Stage 3 ✏️ Spell It";
+
+if(stage===4)
+return "Stage 4 🔀 Put Them in Order";
+
+return "Stage 5 🏆 Final Challenge";
+
+}
+
+
+/* =========================
+STAGE 1
+LISTEN & CHOOSE
+MONDAY → SUNDAY
+========================= */
+
+function stage1(){
+
+/*
+The question follows the order
+Monday → Sunday.
+Only the answer choices are shuffled.
+*/
+
+currentDay=days[questionIndex];
+
+let choices=shuffle([...days]);
+
+let html=`
+
+<div class="question">
+🎧 Listen carefully!
+</div>
+
+<button
+class="listen-btn"
+onclick="speakDay('${currentDay}')">
+🔊 Listen Again
+</button>
+
+<div class="options">
+`;
+
+choices.forEach(function(day){
+
+html+=`
+
+<button
+class="option"
+onclick="checkListen('${day}',this)">
+${day}
+</button>
+
+`;
+
+});
+
+html+=`
+</div>
+`;
+
+document.getElementById("questionArea")
+.innerHTML=html;
+
+setTimeout(function(){
+
+speakDay(currentDay);
+
+},500);
+
+}
+
+
+/* =========================
+TEXT TO SPEECH
+========================= */
+
+function speakDay(day){
+
+speechSynthesis.cancel();
+
+let voice=
+new SpeechSynthesisUtterance(day);
+
+voice.lang="en-US";
+
+voice.rate=0.75;
+
+voice.pitch=1.05;
+
+speechSynthesis.speak(voice);
+
+}
+
+
+/* =========================
+CHECK LISTENING
+========================= */
+
+function checkListen(answer,button){
+
+if(questionLocked)return;
+
+if(answer===currentDay){
+
+questionLocked=true;
+
+button.classList.add("correct");
+
+correctAnswer();
+
+}
+
+else{
+
+button.classList.add("wrong");
+
+loseLife("Try again!");
+
+}
+
+}
+
+
+/* =========================
+STAGE 2
+READ & SAY
+MONDAY → SUNDAY
+========================= */
+
+function stage2(){
+
+currentDay=days[questionIndex];
+
+document.getElementById("questionArea")
+.innerHTML=`
+
+<div class="question">
+📖 Read the word aloud!
+</div>
+
+<div class="big-word">
+${currentDay}
+</div>
+
+<button
+class="mic-btn"
+onclick="startRecognition()">
+🎤 Speak
+</button>
+
+<div
+id="speakingStatus"
+class="speaking-status">
+Tap the microphone and say the word.
+</div>
+
+<p style="color:#777;">
+Your voice will be checked automatically.
+</p>
+
+`;
+
+}
+
+
+/* =========================
+SPEECH RECOGNITION
+========================= */
+
+function startRecognition(){
+
+if(questionLocked)return;
+
+const SpeechRecognition=
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+
+document.getElementById("speakingStatus")
+.textContent=
+"Please use Chrome for voice practice.";
+
+return;
+
+}
+
+stopRecognition();
+
+recognition=
+new SpeechRecognition();
+
+recognition.lang="en-US";
+
+recognition.continuous=false;
+
+recognition.interimResults=false;
+
+recognition.maxAlternatives=1;
+
+
+let status=
+document.getElementById("speakingStatus");
+
+status.textContent=
+"🎤 Listening...";
+
+
+recognition.onresult=function(event){
+
+if(questionLocked)return;
+
+let spoken=
+event.results[0][0]
+.transcript
+.trim()
+.toLowerCase();
+
+let target=
+currentDay
+.toLowerCase();
+
+
+/*
+Remove punctuation and spaces
+so the comparison is more reliable.
+*/
+
+spoken=
+spoken.replace(/[^a-z]/g,"");
+
+target=
+target.replace(/[^a-z]/g,"");
+
+
+if(spoken===target){
+
+questionLocked=true;
+
+status.textContent=
+"✅ Excellent!";
+
+correctAnswer();
+
+}
+
+else{
+
+status.textContent=
+"❌ Try again!";
+
+loseLife("I heard: "+
+event.results[0][0].transcript);
+
+}
+
+};
+
+
+recognition.onerror=function(event){
+
+if(event.error==="no-speech"){
+
+status.textContent=
+"🎤 I didn't hear you. Try again!";
+
+}
+
+else if(event.error==="not-allowed"){
+
+status.textContent=
+"🎤 Please allow microphone access.";
+
+}
+
+else{
+
+status.textContent=
+"🎤 Try again.";
+
+}
+
+};
+
+
+recognition.onend=function(){
+
+recognition=null;
+
+};
+
+
+try{
+
+recognition.start();
+
+}
+
+catch(error){
+
+status.textContent=
+"🎤 Tap the microphone again.";
+
+}
+
+}
+
+
+/* =========================
+STOP RECOGNITION
+========================= */
+
+function stopRecognition(){
+
+if(recognition){
+
+try{
+
+recognition.stop();
+
+}
+
+catch(e){}
+
+recognition=null;
+
+}
+
+}
+
+
+/* =========================
+STAGE 3
+SPELL IT
+MONDAY → SUNDAY
+========================= */
+
+function stage3(){
+
+currentDay=days[questionIndex];
+
+selectedLetters="";
+
+let letters=
+shuffle(currentDay.split(""));
+
+let html=`
+
+<div class="question">
+✏️ Spell the word!
+</div>
+
+<div
+class="spell-box"
+id="spellBox">
+</div>
+
+<div class="letters">
+`;
+
+letters.forEach(function(letter,index){
+
+html+=`
+
+<button
+class="letter"
+id="letter-${index}"
+onclick="chooseLetter('${letter}',${index})">
+${letter}
+</button>
+
+`;
+
+});
+
+html+=`
+</div>
+`;
+
+document.getElementById("questionArea")
+.innerHTML=html;
+
+}
+
+
+/* =========================
+CHOOSE LETTER
+========================= */
+
+function chooseLetter(letter,index){
+
+if(questionLocked)return;
+
+let button=
+document.getElementById(
+"letter-"+index
+);
+
+if(button.classList.contains("used"))
+return;
+
+button.classList.add("used");
+
+selectedLetters+=letter;
+
+document.getElementById("spellBox")
+.textContent=selectedLetters;
+
+
+if(selectedLetters.length===
+currentDay.length){
+
+if(selectedLetters===currentDay){
+
+questionLocked=true;
+
+correctAnswer();
+
+}
+
+else{
+
+loseLife("Check the spelling!");
+
+setTimeout(function(){
+
+if(!questionLocked){
+
+selectedLetters="";
+
+document.getElementById("spellBox")
+.textContent="";
+
+document
+.querySelectorAll(".letter")
+.forEach(function(btn){
+
+btn.classList.remove("used");
+
+});
+
+}
+
+},600);
+
+}
+
+}
+
+}
+
+
+/* =========================
+STAGE 4
+ONLY ONE QUESTION
+SHUFFLED
+========================= */
+
+function stage4(){
+
+selectedOrder=[];
+
+let shuffledDays=
+shuffle([...days]);
+
+let html=`
+
+<div class="question">
+🔀 Put the days in order!
+</div>
+
+<p style="font-size:20px;">
+Start with Monday and finish with Sunday.
+</p>
+
+<div class="days-order">
+`;
+
+shuffledDays.forEach(function(day){
+
+html+=`
+
+<button
+class="day-btn"
+onclick="selectOrder('${day}',this)">
+${day}
+</button>
+
+`;
+
+});
+
+html+=`
+
+</div>
+
+<div
+id="orderResult"
+class="order-result">
+</div>
+
+`;
+
+document.getElementById("questionArea")
+.innerHTML=html;
+
+}
+
+
+/* =========================
+ORDER
+========================= */
+
+function selectOrder(day,button){
+
+if(questionLocked)return;
+
+selectedOrder.push(day);
+
+button.classList.add("selected");
+
+document.getElementById("orderResult")
+.textContent=
+selectedOrder.join(" → ");
+
+
+if(selectedOrder.length===7){
+
+let correct=
+selectedOrder.every(function(day,index){
+
+return day===days[index];
+
+});
+
+
+if(correct){
+
+questionLocked=true;
+
+correctAnswer();
+
+}
+
+else{
+
+loseLife("Try the order again!");
+
+setTimeout(function(){
+
+if(!questionLocked){
+
+selectedOrder=[];
+
+document.getElementById("orderResult")
+.textContent="";
+
+document
+.querySelectorAll(".day-btn")
+.forEach(function(btn){
+
+btn.classList.remove("selected");
+
+});
+
+}
+
+},700);
+
+}
+
+}
+
+}
+
+
+/* =========================
+STAGE 5
+FINAL CHALLENGE
+7 QUESTIONS
+========================= */
+
+function stage5(){
+
+currentDay=
+days[Math.floor(
+Math.random()*days.length
+)];
+
+let type=
+Math.floor(Math.random()*3);
+
+
+if(type===0){
+
+finalListening();
+
+}
+
+else if(type===1){
+
+finalSpeaking();
+
+}
+
+else{
+
+finalSpelling();
+
+}
+
+}
+
+
+/* =========================
+FINAL LISTENING
+========================= */
+
+function finalListening(){
+
+let choices=
+shuffle([...days]);
+
+let html=`
+
+<div class="question">
+🏆 Final Challenge: Listen!
+</div>
+
+<button
+class="listen-btn"
+onclick="speakDay('${currentDay}')">
+🔊 Listen
+</button>
+
+<div class="options">
+`;
+
+choices.forEach(function(day){
+
+html+=`
+
+<button
+class="option"
+onclick="checkFinalListen('${day}',this)">
+${day}
+</button>
+
+`;
+
+});
+
+html+=`
+</div>
+`;
+
+document.getElementById("questionArea")
+.innerHTML=html;
+
+setTimeout(function(){
+
+speakDay(currentDay);
+
+},500);
+
+}
+
+
+function checkFinalListen(answer,button){
+
+if(questionLocked)return;
+
+if(answer===currentDay){
+
+questionLocked=true;
+
+button.classList.add("correct");
+
+correctAnswer();
+
+}
+
+else{
+
+button.classList.add("wrong");
+
+loseLife("Try again!");
+
+}
+
+}
+
+
+/* =========================
+FINAL SPEAKING
+========================= */
+
+function finalSpeaking(){
+
+document.getElementById("questionArea")
+.innerHTML=`
+
+<div class="question">
+🏆 Final Challenge: Speak!
+</div>
+
+<div class="big-word">
+${currentDay}
+</div>
+
+<button
+class="mic-btn"
+onclick="startRecognition()">
+🎤 Say It
+</button>
+
+<div
+id="speakingStatus"
+class="speaking-status">
+Say the word clearly.
+</div>
+
+`;
+
+}
+
+
+/* =========================
+FINAL SPELLING
+========================= */
+
+function finalSpelling(){
+
+selectedLetters="";
+
+let letters=
+shuffle(currentDay.split(""));
+
+let html=`
+
+<div class="question">
+🏆 Final Challenge: Spell It!
+</div>
+
+<div
+class="spell-box"
+id="spellBox">
+</div>
+
+<div class="letters">
+`;
+
+letters.forEach(function(letter,index){
+
+html+=`
+
+<button
+class="letter"
+id="letter-${index}"
+onclick="chooseFinalLetter('${letter}',${index})">
+${letter}
+</button>
+
+`;
+
+});
+
+html+=`
+</div>
+`;
+
+document.getElementById("questionArea")
+.innerHTML=html;
+
+}
+
+
+/* =========================
+FINAL LETTERS
+========================= */
+
+function chooseFinalLetter(letter,index){
+
+if(questionLocked)return;
+
+let button=
+document.getElementById(
+"letter-"+index
+);
+
+if(button.classList.contains("used"))
+return;
+
+button.classList.add("used");
+
+selectedLetters+=letter;
+
+document.getElementById("spellBox")
+.textContent=selectedLetters;
+
+
+if(selectedLetters.length===
+currentDay.length){
+
+if(selectedLetters===currentDay){
+
+questionLocked=true;
+
+correctAnswer();
+
+}
+
+else{
+
+loseLife("Check the spelling!");
+
+setTimeout(function(){
+
+if(!questionLocked){
+
+selectedLetters="";
+
+document.getElementById("spellBox")
+.textContent="";
+
+document
+.querySelectorAll(".letter")
+.forEach(function(btn){
+
+btn.classList.remove("used");
+
+});
+
+}
+
+},600);
+
+}
+
+}
+
+}
+
+
+/* =========================
+CORRECT ANSWER
+========================= */
+
+function correctAnswer(){
+
+clearInterval(timerInterval);
+
+stopRecognition();
+
+playWinSound();
+
+score+=10;
+
+document.getElementById("score")
+.textContent=score;
+
+document.getElementById("feedback")
+.textContent=
+"🎉 Excellent!";
+
+setTimeout(function(){
+
+nextQuestion();
+
+},900);
+
+}
+
+
+/* =========================
+LOSE LIFE
+========================= */
+
+function loseLife(message){
+
+lives--;
+
+updateLives();
+
+playLoseSound();
+
+document.getElementById("feedback")
+.textContent=
+"❌ "+message;
+
+
+if(lives<=0){
+
+questionLocked=true;
+
+clearInterval(timerInterval);
+
+stopRecognition();
+
+setTimeout(function(){
+
+gameOver();
+
+},800);
+
+}
+
+}
+
+
+/* =========================
+NEXT QUESTION
+========================= */
+
+function nextQuestion(){
+
+questionIndex++;
+
+
+/*
+STAGE 1
+7 DAYS
+*/
+
+if(stage===1 &&
+questionIndex>=7){
+
+stage=2;
+
+questionIndex=0;
+
+}
+
+
+/*
+STAGE 2
+7 DAYS
+*/
+
+else if(stage===2 &&
+questionIndex>=7){
+
+stage=3;
+
+questionIndex=0;
+
+}
+
+
+/*
+STAGE 3
+7 DAYS
+*/
+
+else if(stage===3 &&
+questionIndex>=7){
+
+stage=4;
+
+questionIndex=0;
+
+}
+
+
+/*
+STAGE 4
+ONLY ONE QUESTION
+*/
+
+else if(stage===4){
+
+stage=5;
+
+questionIndex=0;
+
+}
+
+
+/*
+STAGE 5
+7 QUESTIONS
+*/
+
+else if(stage===5 &&
+questionIndex>=7){
+
+winGame();
+
+return;
+
+}
+
+
+showQuestion();
+
+}
+
+
+/* =========================
+WIN
+========================= */
+
+function winGame(){
+
+clearInterval(timerInterval);
+
+stopRecognition();
+
+playWinSound();
+
+document
+.getElementById("gameScreen")
+.classList.add("hidden");
+
+document
+.getElementById("endScreen")
+.classList.remove("hidden");
+
+document
+.getElementById("endEmoji")
+.textContent="🏆🎉🌈";
+
+document
+.getElementById("endTitle")
+.textContent=
+"Amazing, "+playerName+"!";
+
+document
+.getElementById("endMessage")
+.textContent=
+"You completed all 5 stages! You are a Days of the Week Superstar! ⭐";
+
+document
+.getElementById("finalScore")
+.textContent=score;
+
+}
+
+
+/* =========================
+GAME OVER
+========================= */
+
+function gameOver(){
+
+clearInterval(timerInterval);
+
+stopRecognition();
+
+playLoseSound();
+
+document
+.getElementById("gameScreen")
+.classList.add("hidden");
+
+document
+.getElementById("endScreen")
+.classList.remove("hidden");
+
+document
+.getElementById("endEmoji")
+.textContent="💪😊";
+
+document
+.getElementById("endTitle")
+.textContent=
+"Good Try, "+playerName+"!";
+
+document
+.getElementById("endMessage")
+.textContent=
+"Don't give up! Practice the days and try again! 🌟";
+
+document
+.getElementById("finalScore")
+.textContent=score;
+
+}
+
+
+/* =========================
+SHUFFLE
+========================= */
+
+function shuffle(array){
+
+for(let i=array.length-1;i>0;i--){
+
+let j=
+Math.floor(Math.random()*(i+1));
+
+[array[i],array[j]]=
+[array[j],array[i]];
+
+}
+
+return array;
+
+}
+
+
+/* =========================
+WIN SOUND
+========================= */
+
+function playWinSound(){
+
+try{
+
+let AudioContext=
+window.AudioContext ||
+window.webkitAudioContext;
+
+let ctx=
+new AudioContext();
+
+let notes=[
+523.25,
+659.25,
+783.99,
+1046.50
+];
+
+notes.forEach(function(freq,index){
+
+let oscillator=
+ctx.createOscillator();
+
+let gain=
+ctx.createGain();
+
+oscillator.type="sine";
+
+oscillator.frequency.value=freq;
+
+gain.gain.setValueAtTime(
+0.001,
+ctx.currentTime+index*.12
+);
+
+gain.gain.exponentialRampToValueAtTime(
+0.3,
+ctx.currentTime+index*.12+0.03
+);
+
+gain.gain.exponentialRampToValueAtTime(
+0.001,
+ctx.currentTime+index*.12+0.25
+);
+
+oscillator.connect(gain);
+
+gain.connect(ctx.destination);
+
+oscillator.start(
+ctx.currentTime+index*.12
+);
+
+oscillator.stop(
+ctx.currentTime+index*.12+0.3
+);
+
+});
+
+}
+catch(e){}
+
+}
+
+
+/* =========================
+LOSE SOUND
+========================= */
+
+function playLoseSound(){
+
+try{
+
+let AudioContext=
+window.AudioContext ||
+window.webkitAudioContext;
+
+let ctx=
+new AudioContext();
+
+let oscillator=
+ctx.createOscillator();
+
+let gain=
+ctx.createGain();
+
+oscillator.type="sawtooth";
+
+oscillator.frequency.setValueAtTime(
+300,
+ctx.currentTime
+);
+
+oscillator.frequency.exponentialRampToValueAtTime(
+120,
+ctx.currentTime+0.45
+);
+
+gain.gain.setValueAtTime(
+0.25,
+ctx.currentTime
+);
+
+gain.gain.exponentialRampToValueAtTime(
+0.001,
+ctx.currentTime+0.5
+);
+
+oscillator.connect(gain);
+
+gain.connect(ctx.destination);
+
+oscillator.start();
+
+oscillator.stop(
+ctx.currentTime+0.5
+);
+
+}
+catch(e){}
+
+}
+
+</script>
+
+</body>
+</html>
